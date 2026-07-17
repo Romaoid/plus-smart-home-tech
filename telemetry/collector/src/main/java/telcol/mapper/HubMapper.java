@@ -1,5 +1,6 @@
 package telcol.mapper;
 
+import telcol.dto.hub.HubEvent;
 import telcol.dto.hub.device.added.DeviceAddedEvent;
 import telcol.dto.hub.device.removed.DeviceRemovedEvent;
 import telcol.dto.hub.scenario.added.ScenarioAddedEvent;
@@ -15,11 +16,7 @@ public class HubMapper {
                                 e.getDeviceType().toString()))
                 .build();
 
-        return HubEventAvro.newBuilder()
-                .setHubId(e.getHubId())
-                .setTimestamp(e.getTimestamp())
-                .setPayload(event)
-                .build();
+        return buildHubEvent(e, event);
     }
 
     public static HubEventAvro mapToAvro(DeviceRemovedEvent e) {
@@ -27,11 +24,7 @@ public class HubMapper {
                 .setId(e.getId())
                 .build();
 
-        return HubEventAvro.newBuilder()
-                .setHubId(e.getHubId())
-                .setTimestamp(e.getTimestamp())
-                .setPayload(event)
-                .build();
+        return buildHubEvent(e, event);
     }
 
     public static HubEventAvro mapToAvro(ScenarioAddedEvent e) {
@@ -57,11 +50,7 @@ public class HubMapper {
                 )
                 .build();
 
-        return HubEventAvro.newBuilder()
-                .setHubId(e.getHubId())
-                .setTimestamp(e.getTimestamp())
-                .setPayload(event)
-                .build();
+        return buildHubEvent(e, event);
     }
 
     public static HubEventAvro mapToAvro(ScenarioRemovedEvent e) {
@@ -69,10 +58,14 @@ public class HubMapper {
                 .setName(e.getName())
                 .build();
 
+        return buildHubEvent(e, event);
+    }
+
+    private static HubEventAvro buildHubEvent(HubEvent event, Object payload) {
         return HubEventAvro.newBuilder()
-                .setHubId(e.getHubId())
-                .setTimestamp(e.getTimestamp())
-                .setPayload(event)
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
                 .build();
     }
 }

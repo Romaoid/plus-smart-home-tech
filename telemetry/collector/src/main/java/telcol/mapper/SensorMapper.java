@@ -11,12 +11,7 @@ public class SensorMapper {
                 .setTemperatureC(e.getTemperatureC())
                 .build();
 
-        return SensorEventAvro.newBuilder()
-                .setId(e.getId())
-                .setHubId(e.getHubId())
-                .setTimestamp(e.getTimestamp())
-                .setPayload(sensor)
-                .build();
+        return buildSensorEvent(e, sensor);
     }
 
     public static SensorEventAvro mapToAvro(LightSensorEvent e) {
@@ -25,12 +20,7 @@ public class SensorMapper {
                 .setLuminosity(e.getLuminosity())
                 .build();
 
-        return SensorEventAvro.newBuilder()
-                .setId(e.getId())
-                .setHubId(e.getHubId())
-                .setTimestamp(e.getTimestamp())
-                .setPayload(sensor)
-                .build();
+        return buildSensorEvent(e, sensor);
     }
 
     public static SensorEventAvro mapToAvro(MotionSensorEvent e) {
@@ -40,12 +30,7 @@ public class SensorMapper {
                 .setVoltage(e.getVoltage())
                 .build();
 
-        return SensorEventAvro.newBuilder()
-                .setId(e.getId())
-                .setHubId(e.getHubId())
-                .setTimestamp(e.getTimestamp())
-                .setPayload(sensor)
-                .build();
+        return buildSensorEvent(e, sensor);
     }
 
     public static SensorEventAvro mapToAvro(SwitchSensorEvent e) {
@@ -53,12 +38,7 @@ public class SensorMapper {
                 .setState(e.isState())
                 .build();
 
-        return SensorEventAvro.newBuilder()
-                .setId(e.getId())
-                .setHubId(e.getHubId())
-                .setTimestamp(e.getTimestamp())
-                .setPayload(sensor)
-                .build();
+        return buildSensorEvent(e, sensor);
     }
 
     public static SensorEventAvro mapToAvro(TemperatureSensorEvent e) {
@@ -67,11 +47,15 @@ public class SensorMapper {
                 .setTemperatureF(e.getTemperatureF())
                 .build();
 
+        return buildSensorEvent(e, sensor);
+    }
+
+    private static SensorEventAvro buildSensorEvent(SensorEvent event, Object payload) {
         return SensorEventAvro.newBuilder()
-                .setId(e.getId())
-                .setHubId(e.getHubId())
-                .setTimestamp(e.getTimestamp())
-                .setPayload(sensor)
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
                 .build();
     }
 }
