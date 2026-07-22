@@ -1,7 +1,7 @@
 app:
   grpc:
     server:
-      port: 9090
+      port: 8080
 
   kafka:
     topics:
