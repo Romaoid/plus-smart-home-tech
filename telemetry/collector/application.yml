@@ -1,4 +1,8 @@
 app:
+  grpc:
+    server:
+      port: 9090
+
   kafka:
     topics:
       sensors: ${KAFKA_TOPIC_SENSORS:telemetry.sensors.v1}
