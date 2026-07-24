@@ -1,69 +1,74 @@
 package telcol.controller;
 
-import telcol.dto.hub.device.added.DeviceAddedEvent;
-import telcol.dto.hub.device.removed.DeviceRemovedEvent;
-import telcol.dto.hub.scenario.added.ScenarioAddedEvent;
-import telcol.dto.hub.scenario.removed.ScenarioRemovedEvent;
-import telcol.dto.sensor.*;
-import jakarta.validation.Valid;
-import telcol.dto.hub.HubEvent;
-import lombok.AllArgsConstructor;
+import com.google.protobuf.Empty;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
-import telcol.mapper.HubMapper;
-import telcol.mapper.SensorMapper;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
-import telcol.sender.HubV1Sender;
-import telcol.sender.SensorV1Sender;
+import net.devh.boot.grpc.server.service.GrpcService;
+import ru.yandex.practicum.grpc.telemetry.collector.CollectorControllerGrpc;
+import ru.yandex.practicum.grpc.telemetry.event.*;
+import telcol.handler.hub.HubEventHandler;
+import telcol.handler.sensor.SensorEventHandler;
 
-@RestController
-@RequestMapping("/events")
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Slf4j
-@AllArgsConstructor
-public class EventController {
-    private HubV1Sender hubV1Sender;
-    private SensorV1Sender sensorV1Sender;
+@GrpcService
+public class EventController extends CollectorControllerGrpc.CollectorControllerImplBase {
+    private final Map<HubEventProto.PayloadCase, HubEventHandler> hubEventHandlers;
+    private final Map<SensorEventProto.PayloadCase, SensorEventHandler> sensorEventHandlers;
 
-    @PostMapping("/sensors")
-    public void collectSensorEvent(@Valid @RequestBody SensorEvent event) {
+    public EventController(Set<HubEventHandler> hubEventHandlers,
+                           Set<SensorEventHandler> sensorEventHandlers) {
+        this.hubEventHandlers = hubEventHandlers.stream()
+                .collect(Collectors.toMap(
+                        HubEventHandler::getMessageType,
+                        Function.identity()
+                ));
+        this.sensorEventHandlers = sensorEventHandlers.stream()
+                .collect(Collectors.toMap(
+                        SensorEventHandler::getMessageType,
+                        Function.identity()
+                ));
+    }
+
+    @Override
+    public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
         try {
-            SensorEventAvro avroEvent = switch (event) {
-                case ClimateSensorEvent e -> SensorMapper.mapToAvro(e);
-                case LightSensorEvent e -> SensorMapper.mapToAvro(e);
-                case MotionSensorEvent e -> SensorMapper.mapToAvro(e);
-                case SwitchSensorEvent e -> SensorMapper.mapToAvro(e);
-                case TemperatureSensorEvent e -> SensorMapper.mapToAvro(e);
-                default -> throw new IllegalArgumentException(
-                        "Unsupported event type: " + event.getClass().getSimpleName()
-                );
-            };
+            if (sensorEventHandlers.containsKey(request.getPayloadCase())) {
+                sensorEventHandlers.get(request.getPayloadCase()).handle(request);
+            } else {
+                throw new IllegalArgumentException("Не могу найти обработчик для события " + request.getPayloadCase());
+            }
 
-            sensorV1Sender.sendEvent(avroEvent);
-        } catch (IllegalArgumentException e) {
-            log.error("Failed to process event: {}", e.getMessage());
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(new StatusRuntimeException(
+                    Status.INTERNAL
+                            .withDescription(e.getLocalizedMessage())
+                            .withCause(e)
+            ));
         }
     }
 
-    @PostMapping("/hubs")
-    public void collectHubEvent(@Valid @RequestBody HubEvent event) {
+    @Override
+    public void collectHubEvent(HubEventProto request, StreamObserver<Empty> responseObserver) {
         try {
-            HubEventAvro avroEvent = switch (event) {
-                case DeviceAddedEvent e -> HubMapper.mapToAvro(e);
-                case DeviceRemovedEvent e -> HubMapper.mapToAvro(e);
-                case ScenarioAddedEvent e -> HubMapper.mapToAvro(e);
-                case ScenarioRemovedEvent e -> HubMapper.mapToAvro(e);
-                default -> throw new IllegalArgumentException(
-                        "Unsupported event type: " + event.getClass().getSimpleName()
-                );
-            };
+            if (hubEventHandlers.containsKey(request.getPayloadCase())) {
+                hubEventHandlers.get(request.getPayloadCase()).handle(request);
+            } else {
+                throw new IllegalArgumentException("Не могу найти обработчик для события " + request.getPayloadCase());
+            }
 
-            hubV1Sender.sendEvent(avroEvent);
-        } catch (IllegalArgumentException e) {
-            log.error("Failed to process event: {}", e.getMessage());
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(new StatusRuntimeException(Status.fromThrowable(e)));
         }
     }
 }
