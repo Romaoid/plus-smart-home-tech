@@ -21,6 +21,6 @@ public class KafkaProperties {
     public static class Producer {
         private String bootstrapServers = "localhost:9092";
         private String keySerializer = "org.apache.kafka.common.serialization.StringSerializer";
-        private String valueSerializer = "telcol.serializer.GeneralAvroSerializer";
+        private String valueSerializer = "tools.serializer.GeneralAvroSerializer";
     }
 }

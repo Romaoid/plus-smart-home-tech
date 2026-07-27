@@ -1,6 +1,7 @@
 package telcol.handler.hub;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceAddedEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
@@ -10,6 +11,7 @@ import telcol.sender.HubV1Sender;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class DeviceAddedEventHandler implements HubEventHandler {
     private HubV1Sender hubV1Sender;
 
@@ -29,6 +31,7 @@ public class DeviceAddedEventHandler implements HubEventHandler {
                                 addedEventProto.getType().toString()))
                 .build();
 
+        log.debug("Отправляю: {}, {}",event, addedEventProto);
         hubV1Sender.sendEvent(
                 build(event, deviceAddedEventAvro));
     }
