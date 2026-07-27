@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"telcol"})
+@ComponentScan(basePackages = {"telcol", "tools"})
 public class EventCollector {
 
     public static void main(String[] args) {

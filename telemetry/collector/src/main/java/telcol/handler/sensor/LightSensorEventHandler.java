@@ -1,6 +1,7 @@
 package telcol.handler.sensor;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
@@ -8,6 +9,7 @@ import telcol.sender.SensorV1Sender;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class LightSensorEventHandler implements SensorEventHandler {
     private SensorV1Sender sensorV1Sender;
 
@@ -23,6 +25,7 @@ public class LightSensorEventHandler implements SensorEventHandler {
                 .setLuminosity(event.getLightSensor().getLuminosity())
                 .build();
 
+        log.debug("Отправляю: {}, {}",event, sensor);
         sensorV1Sender.sendEvent(
                 build(event, sensor)
         );

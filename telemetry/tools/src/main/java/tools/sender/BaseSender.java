@@ -1,16 +1,15 @@
-package telcol.sender;
+package tools.sender;
 
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.stereotype.Component;
-import telcol.producer.ProducerClient;
+import tools.producer.ProducerClient;
 
-@Component
-public abstract class BaseEventSender<T extends SpecificRecordBase> {
+public abstract class BaseSender<T extends SpecificRecordBase> {
+
     private final ProducerClient client;
     private final String topic;
 
-    protected BaseEventSender(ProducerClient client, String topic) {
+    protected BaseSender(ProducerClient client, String topic) {
         this.client = client;
         this.topic = topic;
     }
@@ -18,5 +17,9 @@ public abstract class BaseEventSender<T extends SpecificRecordBase> {
     public void sendEvent(T message) {
         ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(topic, message);
         client.getProducer().send(record);
+    }
+
+    public void stop() {
+        client.stop();
     }
 }
