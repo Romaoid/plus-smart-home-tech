@@ -24,6 +24,7 @@ public class BaseConsumer {
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, configProvider.getMaxPollRecords());
         props.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, configProvider.getFetchMaxBytes());
         props.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, configProvider.getMaxPartitionFetch());
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, configProvider.getEnableAutoCommit());
 
         log.info("Initializing Kafka consumer with bootstrap servers: {}",
                 configProvider.getBootstrapServers());

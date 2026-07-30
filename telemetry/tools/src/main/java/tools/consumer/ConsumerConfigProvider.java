@@ -9,4 +9,7 @@ public interface ConsumerConfigProvider {
     int getMaxPollRecords();
     int getFetchMaxBytes();
     int getMaxPartitionFetch();
+    default boolean getEnableAutoCommit() {
+        return true;
+    }
 }

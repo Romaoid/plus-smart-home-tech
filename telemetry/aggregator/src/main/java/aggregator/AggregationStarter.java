@@ -3,7 +3,6 @@ package aggregator;
 import aggregator.config.KafkaProperties;
 import aggregator.consumer.AggregatorConsumerConfigProvider;
 import aggregator.sender.SnapshotV1Sender;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -54,7 +53,7 @@ public class AggregationStarter {
 
                     Optional<SensorsSnapshotAvro> updatedSnapshot = updateState(record.value());
 
-                    updatedSnapshot.ifPresent(snapshot -> producer.sendEvent(snapshot));
+                    updatedSnapshot.ifPresent(producer::sendEvent);
 
                     manageOffsets(record, count, consumer);
                     count++;

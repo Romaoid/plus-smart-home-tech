@@ -17,6 +17,7 @@
         <module>collector</module>
         <module>aggregator</module>
         <module>tools</module>
+        <module>analyzer</module>
     </modules>
 
 </project>
