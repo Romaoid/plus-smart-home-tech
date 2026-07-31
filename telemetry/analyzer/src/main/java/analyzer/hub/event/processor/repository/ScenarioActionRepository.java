@@ -12,6 +12,7 @@ import java.util.List;
 
 
 public interface ScenarioActionRepository extends JpaRepository<ScenarioAction, ScenarioActionId> {
+    void deleteAllByScenarioIdIn(List<Long> scenarioIds);
 
     @Modifying
     @Transactional

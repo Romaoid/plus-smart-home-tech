@@ -5,7 +5,7 @@ import analyzer.hub.event.processor.entity.Scenario;
 import analyzer.hub.event.processor.entity.ScenarioAction;
 import analyzer.hub.event.processor.entity.ScenarioCondition;
 import analyzer.hub.event.processor.service.ScenarioService;
-import analyzer.snapshot.processor.config.KafkaPropertiesSnapshot;
+import analyzer.config.KafkaProperties;
 import analyzer.snapshot.processor.consumer.AnalyzerSnapshotConsumerConfigProvider;
 import analyzer.snapshot.processor.grps.sender.AnalyzerSender;
 import com.google.protobuf.Timestamp;
@@ -36,14 +36,14 @@ public class SnapshotProcessor {
     private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
     private final AnalyzerSender gRpcSender;
     private final ScenarioService service;
-    private final KafkaPropertiesSnapshot properties;
+    private final KafkaProperties properties;
     private final AnalyzerSnapshotConsumerConfigProvider consumerConfig;
     private final BaseConsumer baseConsumer;
 
     public void start() {
         Consumer<Void, SensorsSnapshotAvro> consumer = baseConsumer.create(consumerConfig);
 
-        List<String> topics = properties.getTopics().getSnapshots();
+        List<String> topics = properties.getTopics().getSnapshotsList();
         Duration consumeAttemptTimeout = Duration.ofMillis(properties.getConsumerAttemptTimeout());
 
         Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
@@ -334,40 +334,34 @@ public class SnapshotProcessor {
 
     private boolean compareValues(Object sensorValue, Integer threshold,
                                   ConditionOperationAvro operation) {
-        if (sensorValue == null) {
-            return false;
-        }
-
-        if (sensorValue instanceof Boolean) {
-            boolean boolValue = (Boolean) sensorValue;
-            switch (operation) {
-                case EQUALS:
-                    return boolValue == (threshold != null && threshold == 1);
-                case GREATER_THAN:
-                case LOWER_THAN:
-                    log.warn("Boolean value with {} operation, skipping", operation);
-                    return false;
-                default:
-                    return false;
-            }
-        }
-
-        if (sensorValue instanceof Integer) {
-            int intValue = (Integer) sensorValue;
-            if (threshold == null) {
-                log.warn("Threshold is null for integer comparison");
+        switch (sensorValue) {
+            case null -> {
                 return false;
             }
-
-            switch (operation) {
-                case EQUALS:
-                    return intValue == threshold;
-                case GREATER_THAN:
-                    return intValue > threshold;
-                case LOWER_THAN:
-                    return intValue < threshold;
-                default:
+            case Boolean boolValue -> {
+                return switch (operation) {
+                    case EQUALS -> boolValue == (threshold != null && threshold == 1);
+                    case GREATER_THAN, LOWER_THAN -> {
+                        log.warn("Boolean value with {} operation, skipping", operation);
+                        yield false;
+                    }
+                    default -> false;
+                };
+            }
+            case Integer intValue -> {
+                if (threshold == null) {
+                    log.warn("Threshold is null for integer comparison");
                     return false;
+                }
+
+                return switch (operation) {
+                    case EQUALS -> intValue.equals(threshold);
+                    case GREATER_THAN -> intValue > threshold;
+                    case LOWER_THAN -> intValue < threshold;
+                    default -> false;
+                };
+            }
+            default -> {
             }
         }
 

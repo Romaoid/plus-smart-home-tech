@@ -1,6 +1,6 @@
 package analyzer.hub.event.processor;
 
-import analyzer.hub.event.processor.config.KafkaPropertiesHub;
+import analyzer.config.KafkaProperties;
 import analyzer.hub.event.processor.consumer.AnalyzerHubConsumerConfigProvider;
 import analyzer.hub.event.processor.service.DeviceService;
 import analyzer.hub.event.processor.service.ScenarioService;
@@ -27,14 +27,14 @@ import java.util.stream.StreamSupport;
 public class HubEventProcessor implements Runnable {
     private final DeviceService deviceService;
     private final ScenarioService scenarioService;
-    private final KafkaPropertiesHub properties;
+    private final KafkaProperties properties;
     private final AnalyzerHubConsumerConfigProvider consumerConfig;
     private final BaseConsumer baseConsumer;
 
     @Override
     public void run() {
         Consumer<Void, HubEventAvro> consumer = baseConsumer.create(consumerConfig);
-        List<String> topics = properties.getTopics().getHubs();
+        List<String> topics = properties.getTopics().getHubsList();
         Duration consumeAttemptTimeout = Duration.ofMillis(properties.getConsumerAttemptTimeout());
 
         Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));

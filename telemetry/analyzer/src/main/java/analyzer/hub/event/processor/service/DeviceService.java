@@ -31,14 +31,15 @@ public class DeviceService {
                         )
                 ));
 
-        Map<String, Set<String>> existingDevicesMap = new HashMap<>();
-        for (Map.Entry<String, Set<String>> entry : hubDevicesMap.entrySet()) {
-            String hubId = entry.getKey();
-            Set<String> deviceIds = entry.getValue();
+        Set<String> allDeviceIds = hubDevicesMap.values().stream()
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
 
-            Set<String> existingIds = sensorRepository.findExistingIdsByHubId(deviceIds, hubId);
-            existingDevicesMap.put(hubId, existingIds);
-        }
+        List<Sensor> allExistingSensors = sensorRepository.findAllByIdIn(allDeviceIds);
+
+        Set<String> existingKeys = allExistingSensors.stream()
+                .map(sensor -> sensor.getHubId() + ":" + sensor.getId())
+                .collect(Collectors.toSet());
 
         List<Sensor> sensorsToSave = new ArrayList<>();
         int duplicateCount = 0;
@@ -46,9 +47,9 @@ public class DeviceService {
         for (HubEventAvro event : events) {
             String hubId = event.getHubId();
             String deviceId = ((DeviceAddedEventAvro) event.getPayload()).getId();
+            String key = hubId + ":" + deviceId;
 
-            Set<String> existingIds = existingDevicesMap.get(hubId);
-            if (existingIds != null && existingIds.contains(deviceId)) {
+            if (existingKeys.contains(key)) {
                 duplicateCount++;
                 continue;
             }
@@ -81,26 +82,33 @@ public class DeviceService {
                         )
                 ));
 
-        List<Sensor> sensorsToDelete = new ArrayList<>();
+        Set<String> allDeviceIds = hubDevicesMap.values().stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toSet());
 
+        if (allDeviceIds.isEmpty()) {
+            log.warn("No device IDs provided for deletion");
+            return;
+        }
+
+        List<Sensor> allExistingSensors = sensorRepository.findAllByIdIn(allDeviceIds);
+
+        if (allExistingSensors.isEmpty()) {
+            log.warn("No existing devices found for deletion");
+            return;
+        }
+
+        Set<String> deviceKeysToDelete = new HashSet<>();
         for (Map.Entry<String, List<String>> entry : hubDevicesMap.entrySet()) {
             String hubId = entry.getKey();
-            List<String> deviceIds = entry.getValue();
-
-            List<Sensor> existingSensors = sensorRepository.findAllById(deviceIds);
-
-            List<Sensor> hubSensors = existingSensors.stream()
-                    .filter(sensor -> sensor.getHubId().equals(hubId))
-                    .toList();
-
-            if (hubSensors.isEmpty()) {
-                log.warn("No existing devices found for hubId={}", hubId);
-                continue;
+            for (String deviceId : entry.getValue()) {
+                deviceKeysToDelete.add(hubId + ":" + deviceId);
             }
-
-            sensorsToDelete.addAll(hubSensors);
-            log.info("Found {} devices to delete from hubId={}", hubSensors.size(), hubId);
         }
+
+        List<Sensor> sensorsToDelete = allExistingSensors.stream()
+                .filter(sensor -> deviceKeysToDelete.contains(sensor.getHubId() + ":" + sensor.getId()))
+                .collect(Collectors.toList());
 
         if (sensorsToDelete.isEmpty()) {
             log.warn("No existing devices found for deletion");

@@ -1,6 +1,6 @@
 package analyzer.snapshot.processor.consumer;
 
-import analyzer.snapshot.processor.config.KafkaPropertiesSnapshot;
+import analyzer.config.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.consumer.ConsumerConfigProvider;
@@ -8,7 +8,7 @@ import tools.consumer.ConsumerConfigProvider;
 @Component
 @RequiredArgsConstructor
 public class AnalyzerSnapshotConsumerConfigProvider implements ConsumerConfigProvider {
-    private final KafkaPropertiesSnapshot kafkaProperties;
+    private final KafkaProperties kafkaProperties;
 
     @Override
     public String getClientId() {

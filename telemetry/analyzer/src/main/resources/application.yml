@@ -20,7 +20,6 @@ spring:
       schema-locations: classpath:schema-postgres.sql
       #data-locations: classpath:data.sql
 
-# gRPC
 grpc:
   client:
     hub-router:
@@ -29,7 +28,6 @@ grpc:
       keepAliveWithoutCalls: true
       negotiationType: plaintext
 
-# ??????????
 app:
   kafka:
     topics:
@@ -39,29 +37,27 @@ app:
     consumer:
       attempt-timeout: ${KAFKA_CONSUMER_ATTEMPT_TIMEOUT:1000}
 
-      hubs:
-        client-id: ${KAFKA_CONSUMER_CLIENT_ID:AnalyzerHubsConsumer}
-        group-id: ${KAFKA_CONSUMER_GROUP_ID:Analyzer.HubEvents.group.id}
-        bootstrap-servers: ${KAFKA_CONSUMER_BOOTSTRAP_SERVERS:localhost:9092}
-        key-deserializer: ${KAFKA_KEY_DESERIALIZER:org.apache.kafka.common.serialization.VoidDeserializer}
-        value-deserializer: ${KAFKA_VALUE_DESERIALIZER:analyzer.hub.event.deserializer.HubEventDeserializer}
-        max-poll-records: ${KAFKA_MAX_POLL_RECORDS:200}
-        fetch-max-bytes: ${KAFKA_FETCH_MAX_BYTES:5242880}
-        max-partition-fetch: ${KAFKA_MAX_PARTITION_FETCH:524288}
+    hubsConsumer:
+      client-id: ${KAFKA_CONSUMER_CLIENT_ID:AnalyzerHubsConsumer}
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:Analyzer.HubEvents.group.id}
+      bootstrap-servers: ${KAFKA_CONSUMER_BOOTSTRAP_SERVERS:localhost:9092}
+      key-deserializer: ${KAFKA_KEY_DESERIALIZER:org.apache.kafka.common.serialization.VoidDeserializer}
+      value-deserializer: ${KAFKA_VALUE_DESERIALIZER:analyzer.hub.event.processor.deserializer.HubEventDeserializer}
+      max-poll-records: ${KAFKA_MAX_POLL_RECORDS:200}
+      fetch-max-bytes: ${KAFKA_FETCH_MAX_BYTES:5242880}
+      max-partition-fetch: ${KAFKA_MAX_PARTITION_FETCH:524288}
 
-      snapshots:
-        client-id: ${KAFKA_CONSUMER_CLIENT_ID:AnalyzerSnapshotsConsumer}
-        group-id: ${KAFKA_CONSUMER_GROUP_ID:Analyzer.Snapshots.group.id}
-        bootstrap-servers: ${KAFKA_CONSUMER_BOOTSTRAP_SERVERS:localhost:9092}
-        key-deserializer: ${KAFKA_KEY_DESERIALIZER:org.apache.kafka.common.serialization.VoidDeserializer}
-        value-deserializer: ${KAFKA_VALUE_DESERIALIZER:analyzer.snapshot.processor.deserializer.SnapshotDeserializer}
-        max-poll-records: ${KAFKA_MAX_POLL_RECORDS:100}
-        fetch-max-bytes: ${KAFKA_FETCH_MAX_BYTES:3072000}
-        max-partition-fetch: ${KAFKA_MAX_PARTITION_FETCH:307200}
-        enable-auto-commit: ${KAFKA_ENABLE_AUTO_COMMIT:false}
+    snapshotsConsumer:
+      client-id: ${KAFKA_CONSUMER_CLIENT_ID:AnalyzerSnapshotsConsumer}
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:Analyzer.Snapshots.group.id}
+      bootstrap-servers: ${KAFKA_CONSUMER_BOOTSTRAP_SERVERS:localhost:9092}
+      key-deserializer: ${KAFKA_KEY_DESERIALIZER:org.apache.kafka.common.serialization.VoidDeserializer}
+      value-deserializer: ${KAFKA_VALUE_DESERIALIZER:analyzer.snapshot.processor.deserializer.SnapshotDeserializer}
+      max-poll-records: ${KAFKA_MAX_POLL_RECORDS:100}
+      fetch-max-bytes: ${KAFKA_FETCH_MAX_BYTES:3072000}
+      max-partition-fetch: ${KAFKA_MAX_PARTITION_FETCH:307200}
+      enable-auto-commit: ${KAFKA_ENABLE_AUTO_COMMIT:false}
 
-
-# ???????????
 logging:
   level:
     root: INFO

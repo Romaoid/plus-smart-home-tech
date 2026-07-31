@@ -13,14 +13,14 @@ public class KafkaProperties {
 
     @Data
     public static class Topics {
-        private String sensors = "telemetry.sensors.v1";
-        private String hubs = "telemetry.hubs.v1";
+        private String sensors;
+        private String hubs;
     }
 
     @Data
     public static class Producer {
-        private String bootstrapServers = "localhost:9092";
-        private String keySerializer = "org.apache.kafka.common.serialization.StringSerializer";
-        private String valueSerializer = "tools.serializer.GeneralAvroSerializer";
+        private String bootstrapServers;
+        private String keySerializer;
+        private String valueSerializer;
     }
 }

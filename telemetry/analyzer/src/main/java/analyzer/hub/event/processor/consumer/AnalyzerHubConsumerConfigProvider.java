@@ -1,6 +1,6 @@
 package analyzer.hub.event.processor.consumer;
 
-import analyzer.hub.event.processor.config.KafkaPropertiesHub;
+import analyzer.config.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.consumer.ConsumerConfigProvider;
@@ -8,7 +8,7 @@ import tools.consumer.ConsumerConfigProvider;
 @Component
 @RequiredArgsConstructor
 public class AnalyzerHubConsumerConfigProvider implements ConsumerConfigProvider {
-    private final KafkaPropertiesHub kafkaProperties;
+    private final KafkaProperties kafkaProperties;
     @Override
     public String getClientId() {
         return kafkaProperties.getHubsConsumer().getClientId();

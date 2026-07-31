@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Data
@@ -19,27 +20,31 @@ public class KafkaProperties {
 
     @Data
     public static class Topics {
-        private List<String> sensors = List.of("telemetry.sensors.v1");
-        private String snapshots = "telemetry.snapshots.v1";
+        private String sensors;
+        private String snapshots;
+
+        public List<String> getSensorsList() {
+            return Arrays.asList(sensors.split(","));
+        }
     }
 
     @Data
     public static class Producer {
-        private String bootstrapServers = "localhost:9092";
-        private String keySerializer = "org.apache.kafka.common.serialization.StringSerializer";
-        private String valueSerializer = "tools.serializer.GeneralAvroSerializer";
+        private String bootstrapServers;
+        private String keySerializer;
+        private String valueSerializer;
     }
 
     @Data
     public static class Consumer {
-        private String clientId = "AggregationConsumer";
-        private String groupId = "Aggregation.group.id";
-        private String bootstrapServers = "localhost:9092";
-        private String keyDeserializer = org.apache.kafka.common.serialization.VoidDeserializer.class.getCanonicalName();
-        private String valueDeserializer = aggregator.deserializer.SensorEventDeserializer.class.getName();
+        private String clientId;
+        private String groupId;
+        private String bootstrapServers;
+        private String keyDeserializer;
+        private String valueDeserializer;
 
-        private int maxPollRecords = 100;
-        private int fetchMaxBytes = 3072000;
-        private int maxPartitionFetch = 307200;
+        private int maxPollRecords;
+        private int fetchMaxBytes;
+        private int maxPartitionFetch;
     }
 }

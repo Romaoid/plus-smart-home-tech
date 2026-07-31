@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface SensorRepository extends JpaRepository<Sensor, String> {
+    List<Sensor> findAllByIdIn(Set<String> ids);
+
     @Query("SELECT s.id FROM Sensor s WHERE s.id IN :ids")
     Set<String> findExistingIds(@Param("ids") Set<String> ids);
 

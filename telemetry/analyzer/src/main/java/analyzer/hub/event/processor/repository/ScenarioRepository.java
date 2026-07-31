@@ -40,4 +40,7 @@ public interface ScenarioRepository extends JpaRepository<Scenario, Long> {
         "LEFT JOIN sa.action a " +
         "WHERE s.id IN :scenarioIds ")
     List<ScenarioActionView> findScenarioActions(@Param("scenarioIds") Set<Long> scenarioIds);
+
+    @Query("SELECT s FROM Scenario s WHERE CONCAT(s.hubId, ':', s.name) IN :keys")
+    List<Scenario> findByHubIdAndNameIn(@Param("keys") Set<String> keys);
 }

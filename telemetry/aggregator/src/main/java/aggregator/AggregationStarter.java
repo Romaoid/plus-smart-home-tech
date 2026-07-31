@@ -35,7 +35,7 @@ public class AggregationStarter {
         this.producer = producer;
         this.consumer = baseConsumer.create(consumerConfig);
         this.consumeAttemptTimeout = Duration.ofMillis(properties.getConsumerAttemptTimeout());
-        this.consumerSensorsTopics = properties.getTopics().getSensors();
+        this.consumerSensorsTopics = properties.getTopics().getSensorsList();
     }
 
     public void start() {

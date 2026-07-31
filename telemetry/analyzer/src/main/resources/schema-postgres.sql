@@ -67,3 +67,7 @@ CREATE OR REPLACE TRIGGER tr_bi_scenario_actions_hub_id_check
 BEFORE INSERT ON scenario_actions
 FOR EACH ROW
 EXECUTE FUNCTION check_hub_id();
+
+CREATE INDEX IF NOT EXISTS idx_scenario_condition_scenario_id ON scenario_conditions(scenario_id);
+CREATE INDEX IF NOT EXISTS idx_scenario_action_scenario_id ON scenario_actions(scenario_id);
+CREATE INDEX IF NOT EXISTS idx_scenario_hub_name ON scenarios ((hub_id || ':' || name));

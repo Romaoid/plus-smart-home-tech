@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface ScenarioConditionRepository extends JpaRepository<ScenarioCondition, ScenarioConditionId> {
+    void deleteAllByScenarioIdIn(List<Long> scenarioIds);
 
     @Modifying
     @Transactional
