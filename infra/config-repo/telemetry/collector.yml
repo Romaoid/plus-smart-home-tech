@@ -1,0 +1,14 @@
+grpc:
+  server:
+    port: 59091
+
+app:
+  kafka:
+    topics:
+      sensors: ${KAFKA_TOPIC_SENSORS:telemetry.sensors.v1}
+      hubs: ${KAFKA_TOPIC_HUBS:telemetry.hubs.v1}
+
+    producer:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+      key-serializer: ${KAFKA_KEY_SERIALIZER:org.apache.kafka.common.serialization.StringSerializer}
+      value-serializer: ${KAFKA_VALUE_SERIALIZER:tools.serializer.GeneralAvroSerializer}
