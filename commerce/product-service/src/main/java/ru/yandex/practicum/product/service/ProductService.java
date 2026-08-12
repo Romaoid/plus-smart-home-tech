@@ -39,7 +39,7 @@ public class ProductService {
     }
 
     public ProductDto getProductById(long id) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdAndActiveIsTrue(id)
                 .orElseThrow(() -> new NotFoundException("Product with id " + id + " not found"));
 
         log.debug("Get product by id returns: {}", product);

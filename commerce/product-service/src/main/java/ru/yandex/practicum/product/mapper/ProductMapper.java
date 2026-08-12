@@ -28,6 +28,8 @@ public class ProductMapper {
 
         newProduct.setCategory(category);
 
+        newProduct.setActive(true);
+
         if (!(request.description() == null) && !(request.description().isBlank())) {
             newProduct.setDescription(request.description());
         }
@@ -64,5 +66,8 @@ public class ProductMapper {
             updatedProduct.setImageUrl(request.imageUrl());
         }
 
+        if (request.active() != null) {
+            updatedProduct.setActive(request.active());
+        }
     }
 }
