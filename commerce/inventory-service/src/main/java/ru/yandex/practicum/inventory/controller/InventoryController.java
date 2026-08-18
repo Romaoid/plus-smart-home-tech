@@ -51,4 +51,15 @@ public class InventoryController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(responseBody);
         }
     }
+
+    @PostMapping("/release")
+    public ResponseEntity<ReserveResponse> removeReserve(@Valid @RequestBody ReserveRequest request) {
+        ReserveResponse responseBody = inventoryService.removeReserve(request);
+
+        if (responseBody.success()) {
+            return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+        }
+    }
 }

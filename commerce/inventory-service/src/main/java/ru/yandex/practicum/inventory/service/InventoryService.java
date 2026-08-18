@@ -94,7 +94,7 @@ public class InventoryService {
         log.debug("Record found id DB: {}", oldRecord);
 
         try {
-            validateReserveQuantity(oldRecord.getAvailableQuantity(), request.quantity());
+            validateAvailableQuantity(oldRecord.getAvailableQuantity(), request.quantity());
 
             updatedRecord = InventoryMapper.mapToRecordFromReserveReq(oldRecord, request);
             calculateAvailableQuantity(updatedRecord);
@@ -109,7 +109,33 @@ public class InventoryService {
         }
     }
 
-    private void validateReserveQuantity(int availableQuantity, int quantityToReserve) {
+    @Transactional
+    public ReserveResponse removeReserve(ReserveRequest request) {
+        log.debug("Post release quantity request with: {}", request);
+        InventoryRecord oldRecord;
+        InventoryRecord updatedRecord;
+
+        oldRecord = inventoryRepository.findByProductId(request.productId())
+                .orElseThrow(() -> new NotFoundException("Record with product id " + request.productId() + " not found"));
+        log.debug("Record found id DB: {}", oldRecord);
+
+        try {
+            validateReserveQuantity(oldRecord.getReservedQuantity(), request.quantity());
+
+            updatedRecord = InventoryMapper.mapToRecordFromRemoveReq(oldRecord, request);
+            calculateAvailableQuantity(updatedRecord);
+
+            updatedRecord = inventoryRepository.save(updatedRecord);
+            log.debug("Record updated fields and saved to DB with data: {}", updatedRecord);
+
+            return InventoryMapper.mapToResponse(true, updatedRecord.getAvailableQuantity(), "Release is success");
+        } catch (InsufficientStockException e) {
+            log.warn("Update rejected: {}", e.getMessage());
+            return InventoryMapper.mapToResponse(false, oldRecord.getAvailableQuantity(), e.getMessage());
+        }
+    }
+
+    private void validateAvailableQuantity(int availableQuantity, int quantityToReserve) {
         if (quantityToReserve > availableQuantity) {
             throw new InsufficientStockException("Fault because reserve quantity(" + quantityToReserve + ") more than available");
         }
@@ -123,6 +149,16 @@ public class InventoryService {
     }
 
     private void calculateAvailableQuantity(InventoryRecord record) {
-        record.setAvailableQuantity(record.getQuantity() - record.getReservedQuantity());
+        if (record.getReservedQuantity() == null) {
+            record.setAvailableQuantity(record.getQuantity());
+        } else {
+            record.setAvailableQuantity(record.getQuantity() - record.getReservedQuantity());
+        }
+    }
+
+    private void validateReserveQuantity(int reservedQuantity, int quantityToRelease) {
+        if (quantityToRelease > reservedQuantity) {
+            throw new InsufficientStockException("Fault because release quantity(" + quantityToRelease + ") more than reserved");
+        }
     }
 }

@@ -51,4 +51,13 @@ public class InventoryMapper {
                 message
         );
     }
+
+    public static InventoryRecord mapToRecordFromRemoveReq(InventoryRecord record,
+                                                            ReserveRequest request) {
+        int reserved = record.getReservedQuantity() - request.quantity();
+
+        record.setReservedQuantity(reserved);
+
+        return record;
+    }
 }

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.order.dto.CreateOrderRequest;
 import ru.yandex.practicum.order.dto.OrderDto;
 import ru.yandex.practicum.order.entity.Order;
 import ru.yandex.practicum.order.exception.NotFoundException;
@@ -57,9 +56,7 @@ public class OrderService {
 
     @Loggable
     @Transactional
-    public OrderDto addOrder(CreateOrderRequest request) {
-        Order order = OrderMapper.mapToOrder(new Order(), request);
-
+    public OrderDto addOrder(Order order) {
         calculateTotalPrice(order);
 
         order = orderRepository.save(order);
