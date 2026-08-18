@@ -8,6 +8,18 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
 
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 2000
+            readTimeout: 3000
+            loggerLevel: basic
+          inventory-service:
+            connectTimeout: 1000
+            readTimeout: 2000
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -29,6 +41,8 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.transaction: DEBUG
+    ru.yandex.practicum.order.feign.InventoryClient: DEBUG
+    ru.yandex.practicum.order.feign.ProductClient: INFO
 
 management:
   endpoints:

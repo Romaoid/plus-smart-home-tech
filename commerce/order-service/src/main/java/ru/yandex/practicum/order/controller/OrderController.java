@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.order.dto.CreateOrderRequest;
 import ru.yandex.practicum.order.dto.OrderDto;
+import ru.yandex.practicum.order.service.OrderOrchestrationService;
 import ru.yandex.practicum.order.service.OrderService;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final OrderOrchestrationService orderOrchestrationService;
 
     @GetMapping
     public List<OrderDto> getOrders() {
@@ -33,8 +35,8 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderDto> addOrder(@Valid @RequestBody CreateOrderRequest request) {
-        OrderDto body = orderService.addOrder(request);
+    public ResponseEntity<OrderDto> createOrder(@Valid @RequestBody CreateOrderRequest request) {
+        OrderDto body = orderOrchestrationService.createOrder(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
     }
