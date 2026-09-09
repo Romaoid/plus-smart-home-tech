@@ -5,6 +5,8 @@ import ru.yandex.practicum.order.dto.OrderItemRequest;
 import ru.yandex.practicum.order.dto.ProductDto;
 import ru.yandex.practicum.order.entity.Item;
 
+import java.math.BigDecimal;
+
 public class ItemMapper {
     public static Item mapToItem(OrderItemRequest request, ProductDto product) {
         return Item.builder()
@@ -23,5 +25,13 @@ public class ItemMapper {
                 item.getQuantity(),
                 item.getPrice()
         );
+    }
+
+    public static Item mapToDegradatedItem(OrderItemRequest request) {
+        return Item.builder()
+                .productId(request.productId())
+                .quantity(request.quantity())
+                .price(BigDecimal.ZERO)
+                .build();
     }
 }

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS items (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     order_id BIGINT NOT NULL REFERENCES orders(id),
     product_id BIGINT NOT NULL,
-    product_name VARCHAR NOT NULL,
+    product_name VARCHAR,
     price NUMERIC(19, 2) NOT NULL,
     quantity INTEGER NOT NULL
 );
