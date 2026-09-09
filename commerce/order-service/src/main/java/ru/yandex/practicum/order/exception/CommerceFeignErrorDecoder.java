@@ -9,8 +9,12 @@ public class CommerceFeignErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
-        if (response.status() >= 500) {
-            return new OrderProcessingException("Невозможно оформить заказ, попробуйте позднее");
+        if (response.status() == 404) {
+            return new OrderProcessingException("Товар id:%d не найден");
+        }
+
+        if (response.status() == 409) {
+            return new OrderProcessingException("Товара id:%d в наличии недостаточно");
         }
 
         return defaultDecoder.decode(methodKey, response);
