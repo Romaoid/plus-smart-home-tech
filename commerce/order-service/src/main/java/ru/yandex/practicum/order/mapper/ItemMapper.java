@@ -30,6 +30,7 @@ public class ItemMapper {
     public static Item mapToDegradatedItem(OrderItemRequest request) {
         return Item.builder()
                 .productId(request.productId())
+                .productName("Товар #<%d> (ожидает проверки)".formatted(request.productId()))
                 .quantity(request.quantity())
                 .price(BigDecimal.ZERO)
                 .build();

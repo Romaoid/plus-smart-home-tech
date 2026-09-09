@@ -17,10 +17,7 @@ import ru.yandex.practicum.order.mapper.ItemMapper;
 import ru.yandex.practicum.order.mapper.OrderMapper;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -182,16 +179,16 @@ public class OrderOrchestrationService {
     private Order checkDegradationAndGetOrder(List<Item> items, ReserveResult reserveResult) {
         Order newOrder = new Order();
 
-        String details = items.stream()
-                .filter(item -> item.getProductName() == null
-                        || item.getPrice().equals(BigDecimal.ZERO)
-                        || reserveResult.unReservedItemIds.contains(item.getProductId())
-                )
-                .map(item -> "Товар #<%d> (ожидает проверки)\n".formatted(item.getProductId()))
-                .collect(Collectors.joining());
+        Set<Long> itemIdSet = new HashSet<>(reserveResult.unReservedItemIds);
 
-        if (!details.isEmpty()) {
-            newOrder.setStatusDetails(details);
+        boolean isDegrade = items.stream()
+                .anyMatch(item -> itemIdSet.contains(item.getProductId())
+                        || ((item.getProductName() != null && item.getProductName().contains("ожидает проверки"))
+                        && item.getPrice().equals(BigDecimal.ZERO))
+                );
+
+        if (isDegrade) {
+            newOrder.setStatusDetails("Требует ручной проверки");
             newOrder.setStatus(OrderStatus.PENDING_CONFIRMATION);
         }
 
