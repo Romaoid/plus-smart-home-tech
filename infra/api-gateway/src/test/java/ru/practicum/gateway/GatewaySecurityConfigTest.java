@@ -36,7 +36,6 @@ class GatewaySecurityConfigTest {
 
     @Test
     void orderCreate_withoutCredentials_isUnauthorized() {
-        // TODO: проверьте, что POST /api/orders без учётных данных возвращает 401
         webTestClient
                 .post()
                 .uri("/api/products")
@@ -46,7 +45,6 @@ class GatewaySecurityConfigTest {
 
     @Test
     void orderCreate_withUserCredentials_isOk() {
-        // TODO: проверьте, что POST /api/orders без учётных данных возвращает 401
         webTestClient
                 .post()
                 .uri("/api/orders")
@@ -57,7 +55,6 @@ class GatewaySecurityConfigTest {
 
     @Test
     void productWrite_withUserCredentials_isForbidden() {
-        // TODO: проверьте, что USER не может выполнять write-операцию с каталогом
         webTestClient
                 .patch()
                 .uri("/api/products/1")
@@ -68,7 +65,6 @@ class GatewaySecurityConfigTest {
 
     @Test
     void productWrite_withAdminCredentials_passesSecurity() {
-        // TODO: проверьте, что ADMIN проходит security-проверку для write-операции
         webTestClient
                 .patch()
                 .uri("/api/products/1")
@@ -99,7 +95,6 @@ class GatewaySecurityConfigTest {
 
     @Test
     void unknownRoute_withAdminCredentials_isForbidden() {
-        // TODO: проверьте, что неизвестный маршрут закрыт даже для ADMIN
         webTestClient
                 .post()
                 .uri("/root")
@@ -110,7 +105,6 @@ class GatewaySecurityConfigTest {
 
     @Test
     void corsPreflight_isPublic() {
-        // TODO: проверьте, что OPTIONS /api/orders не блокируется security-слоем
         webTestClient
                 .options()
                 .uri("/api/orders")
