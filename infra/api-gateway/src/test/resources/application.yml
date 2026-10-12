@@ -1,0 +1,67 @@
+
+spring:
+  application:
+    name: api-gateway
+  eureka:
+    client:
+      enabled: false
+      register-with-eureka: false
+      fetch-registry: false
+  cloud:
+    loadbalancer:
+      cache:
+        enabled: false
+    config:
+      enabled: false
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - http://localhost:3000
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowed-headers:
+              - '*'
+            exposed-headers:
+              - Location
+            allow-credentials: true
+            max-age: 3600
+      routes:
+        - id: product-service
+          uri: http://0.0.0.0:1
+          predicates:
+            - Path=/api/products/**,/api/categories/**
+        - id: inventory-service
+          uri: http://0.0.0.0:1
+          predicates:
+            - Path=/api/inventory/**
+        - id: order-service
+          uri: http://0.0.0.0:1
+          predicates:
+            - Path=/api/orders/**
+
+server:
+  port: 0
+
+app:
+  security:
+    users:
+      - username: ivan
+        password: ivan
+        roles:
+          - USER
+      - username: anna
+        password: anna
+        roles:
+          - USER
+          - ADMIN
